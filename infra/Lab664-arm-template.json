@@ -55,6 +55,7 @@
     "cognitiveServicesUserRoleDefinitionId": "a97b65f3-24c7-4388-baec-2e87135dc908",
     "gpt54MiniDeploymentName": "[concat('gpt-5-4-mini-', parameters('uniqueSuffix'))]",
     "gpt52DeploymentName": "[concat('gpt-5-2-', parameters('uniqueSuffix'))]",
+    "gpt5DeploymentName": "[concat('gpt-5-', parameters('uniqueSuffix'))]",
     "gpt55DeploymentName": "[concat('gpt-5-5-', parameters('uniqueSuffix'))]",
     "gpt61SolDeploymentName": "[concat('gpt-6-1-sol-', parameters('uniqueSuffix'))]",
     "gpt6LunaDeploymentName": "[concat('gpt-6-luna-', parameters('uniqueSuffix'))]",
@@ -63,7 +64,9 @@
       "modelDeployments": {
         "text-embedding-3-large": "[variables('textEmbedding3LargeDeploymentName')]",
         "gpt-5.2": "[variables('gpt52DeploymentName')]",
-        "prebuilt-analyzer-completion": "[variables('gpt52DeploymentName')]",
+        "gpt-5": "[variables('gpt5DeploymentName')]",
+        "gpt-5.5": "[variables('gpt55DeploymentName')]",
+        "prebuilt-analyzer-completion": "[variables('gpt55DeploymentName')]",
         "prebuilt-analyzer-completion-mini": "[variables('gpt54MiniDeploymentName')]",
         "prebuilt-analyzer-embedding": "[variables('textEmbedding3LargeDeploymentName')]"
       }
@@ -155,9 +158,31 @@
     {
       "type": "Microsoft.CognitiveServices/accounts/deployments",
       "apiVersion": "2025-06-01",
-      "name": "[concat(variables('accountName'), '/', variables('gpt55DeploymentName'))]",
+      "name": "[concat(variables('accountName'), '/', variables('gpt5DeploymentName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt52DeploymentName'))]"
+      ],
+      "sku": {
+        "name": "GlobalStandard",
+        "capacity": 500
+      },
+      "properties": {
+        "model": {
+          "format": "OpenAI",
+          "name": "gpt-5",
+          "version": "2025-08-07"
+        },
+        "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+        "currentCapacity": 500,
+        "raiPolicyName": "Microsoft.DefaultV2"
+      }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/deployments",
+      "apiVersion": "2025-06-01",
+      "name": "[concat(variables('accountName'), '/', variables('gpt55DeploymentName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt5DeploymentName'))]"
       ],
       "sku": {
         "name": "GlobalStandard",
@@ -318,6 +343,8 @@
       "kind": "AzureCLI",
       "dependsOn": [
         "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt52DeploymentName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt5DeploymentName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt55DeploymentName'))]",
         "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt54MiniDeploymentName'))]",
         "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('textEmbedding3LargeDeploymentName'))]"
       ],
@@ -339,7 +366,7 @@
           }
         ],
         "retentionInterval": "P1D",
-        "scriptContent": "set -euo pipefail\ncurl --fail --show-error --silent --retry 5 --retry-delay 10 --retry-all-errors --request PATCH \"${CU_ENDPOINT}/contentunderstanding/defaults?api-version=2025-11-01\" --header \"Ocp-Apim-Subscription-Key: ${CU_API_KEY}\" --header \"Content-Type: application/json\" --data \"${CU_DEFAULTS_BODY}\"\nprintf '{\"configured\":true}' > \"${AZ_SCRIPTS_OUTPUT_PATH}\"",
+        "scriptContent": "set -euo pipefail\ncurl --fail --show-error --silent --retry 5 --retry-delay 10 --retry-all-errors --request PATCH \"${CU_ENDPOINT}/contentunderstanding/defaults?api-version=2026-06-01-preview\" --header \"Ocp-Apim-Subscription-Key: ${CU_API_KEY}\" --header \"Content-Type: application/json\" --data \"${CU_DEFAULTS_BODY}\"\nprintf '{\"configured\":true}' > \"${AZ_SCRIPTS_OUTPUT_PATH}\"",
         "timeout": "PT10M"
       }
     }
@@ -364,6 +391,10 @@
     "gpt55DeploymentResourceId": {
       "type": "string",
       "value": "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt55DeploymentName'))]"
+    },
+    "gpt5DeploymentResourceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.CognitiveServices/accounts/deployments', variables('accountName'), variables('gpt5DeploymentName'))]"
     },
     "gpt61SolDeploymentResourceId": {
       "type": "string",
