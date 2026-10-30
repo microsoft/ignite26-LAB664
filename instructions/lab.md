@@ -6,8 +6,6 @@ Follow these five steps in order: try prebuilts, customize extraction, classify 
 
 Use [CU Studio](https://contentunderstanding.ai.azure.com/) for steps 1-4. Sign in and select your approved Azure resource. You need permission to use Content Understanding, build analyzers, and use the resource's configured models. Studio tests and live app analysis incur Azure charges.
 
-> [!Alert] **Model choice:** use the Preview workflow with **GPT-5 for classification/segmentation**, **GPT-5.5 for custom repair and statement extraction**, and **GPT-5.2 for prebuilt extraction**. Ask the lab owner to configure those models if unavailable; do not change shared resource deployments or defaults yourself. The app uses `2026-06-01-preview` for this flow.
-
 - [1. Prebuilt](#step-1-explore-prebuilt-analyzers)
 - [2. Custom](#step-2-build-a-custom-repair-extractor)
 - [3. Classifier](#step-3-classify-and-split-a-packet-without-extraction)
@@ -26,9 +24,9 @@ Use [CU Studio](https://contentunderstanding.ai.azure.com/) for steps 1-4. Sign 
 | Prebuilt in Studio | Upload | Inspect |
 |:---|:---|:---|
 | Document Layout | [towing-invoice.pdf](../data/step1/towing-invoice.pdf) | Text, reading order, tables, and page structure. This is not invoice-domain extraction. |
-| Invoice / `prebuilt-invoice` | [Same towing-invoice.pdf](../data/step1/towing-invoice.pdf) | Vendor, customer, charges, total, tax, and line items. A charge is not proof of payment. |
-| ID document / `prebuilt-idDocument.generic` | [demo-id.pdf](../data/step1/demo-id.pdf) | Named holder and available ID-like fields. This fictional membership specimen is not a government ID. |
-| US tax / `prebuilt-tax.us.1099A` | [form-1099a.pdf](../data/step1/form-1099a.pdf) | Tax year, lender, borrower, account, and form boxes. Nested year/copy results are not extra input documents. |
+| Invoice | [Same towing-invoice.pdf](../data/step1/towing-invoice.pdf) | Vendor, customer, charges, total, tax, and line items. A charge is not proof of payment. |
+| Generic ID Document | [demo-id.pdf](../data/step1/demo-id.pdf) | Named holder and available ID-like fields. This fictional membership specimen is not a government ID. |
+| US tax (Form 1099-A) | [form-1099a.pdf](../data/step1/form-1099a.pdf) | Tax year, lender, borrower, account, and form boxes. Nested year/copy results are not extra input documents. |
 
 > [!Note] **Checkpoint:** you can explain the difference between document layout and schema-based extraction.
 
@@ -40,8 +38,10 @@ Use [CU Studio](https://contentunderstanding.ai.azure.com/) for steps 1-4. Sign 
 
 > [!Note] **Upload from `data\step2`:** [repair-estimate.pdf](../data/step2/repair-estimate.pdf) (1 page). This is the same repair estimate used on page 3 of the core packet in the next steps.
 
-1. [] In [CU Studio Build](https://contentunderstanding.ai.azure.com/build), create a Preview **Standard Extraction** project. Start with the **Invoice template** from the [prebuilt-analyzer gallery](https://contentunderstanding.ai.azure.com/discover). In project Advanced, select **GPT-5.5**.
-2. [] Keep the template fields. Add **only these three lowercase fields**, with method **Extract**, and enable source and confidence for them. Do not add separate make/model/year, plate, or odometer-unit fields.
+1. [] Move from **Discover** to **Build** in [CU Studio](https://contentunderstanding.ai.azure.com/build) and select **Create** to open the project creation dialog.
+2. [] Choose a Preview **Standard Extraction** project. Keep the preconfigured model and other settings unchanged, then select **Create** to create the project.
+3. [] Open your new project and select **Browse for Files**. In File Explorer, navigate to C:\Users\LabUser\Desktop\ignite26-LAB664\data\step2 and upload [repair-estimate.pdf](../data/step2/repair-estimate.pdf). In the template selection pop-up that appears, select **Invoice**, then select **Save**.
+4. [] Keep the template fields. Add **only these three lowercase fields**, with method **Extract**, and enable source and confidence for them. Do not add separate make/model/year, plate, or odometer-unit fields.
 
 | Field | Type / method | Copy this description |
 |:---|:---|:---|
@@ -49,13 +49,16 @@ Use [CU Studio](https://contentunderstanding.ai.azure.com/) for steps 1-4. Sign 
 | `vin` | String / Extract | Exact value explicitly labeled VIN. Do not correct it or substitute registration, plate, or account numbers. Leave unset if absent. |
 | `odometer` | Number / Extract | Printed Odometer or Inspection Mileage as a number. Remove grouping separators; no units. Do not substitute Annual Mileage or infer an absent value. |
 
-3. [] Upload [repair-estimate.pdf](../data/step2/repair-estimate.pdf), save, and wait until saving indicators clear. **Run analysis in Studio before building the analyzer.**
-4. [] Check the values and source highlights: `vehicle = "2019 Toyota Corolla LE"`, `vin = "5YFEPMAE3KA513905"`, `odometer = 94360`. The repair proposal total is $1,310.13, distinct from the towing invoice. Missing values must not become invented values or zero.
-5. [] After the test passes, **Build analyzer** with your own unique ID, for example `lab664_lee_repair`. Record the actual ID and verify the saved schema contains the three fields above. Do not overwrite another learner's analyzer.
+5. [] Select **Save** and wait until saving indicators clear, then select **Run analysis**. Test in Studio before building the analyzer.
+6. [] Check the values and source highlights: `vehicle = "2019 Toyota Corolla LE"`, `vin = "5YFEPMAE3KA513905"`, `odometer = 94360`. The repair proposal total is $1,310.13, distinct from the towing invoice. Missing values must not become invented values or zero.
+7. [] After the test passes, **Build analyzer** with your own unique ID, for example `lab664_lee_repair`. Record the actual ID and verify the saved schema contains the three fields above. Do not overwrite another learner's analyzer.
 
 ### Add a Statement extractor
 
-6. [] Create a second Preview **Standard Extraction** project from the **Blank / Document template**. In project Advanced, select **GPT-5.5**. In the field-schema toolbar, choose **Import** and select [statement-schema.json](../data/step2/statement-schema.json) from `data\step2`. Confirm schema replacement if prompted, then **Save**. This imports the fields and descriptions; no field-by-field typing is needed.
+8. [] Return to **Build** and select **Create**. Select the **Preview** API version, then choose **Standard Extraction**. Keep the preconfigured model and other settings unchanged, then select **Create** to create the second project.
+9. [] Open the new project and select **Browse for Files**. Navigate to C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-01 and upload [06-handwriting.pdf](../data/documents/packet-01/06-handwriting.pdf).
+10. [] In the pop-up that appears after the document upload, disable **AI field suggestions**, then select **Save**.
+11. [] In the field-schema toolbar, choose **Import**, navigate to C:\Users\LabUser\Desktop\ignite26-LAB664\data\step2, and select [statement-schema.json](../data/step2/statement-schema.json). Confirm schema replacement if prompted, then **Save**. This imports the fields and descriptions; no field-by-field typing is needed.
 
 After import, verify **seven flat fields: five Extract and two Generate**, with **Source & Confidence** enabled. `incident_date` is **Date**; the other six fields are **String**. Use the table below to validate the import; do not add these fields again.
 
@@ -69,7 +72,9 @@ After import, verify **seven flat fields: five Extract and two Generate**, with 
 | `reported_damage` | String / Generate | A concise synthesis of claimant-reported damage, combining mentions without inventing damage or presenting it as inspected or verified. |
 | `summary` | String / Generate | A concise synthesis of the reported narrative, preserving uncertainty without inferring fault, coverage, liability, or payment. |
 
-7. [] Upload and test both [06-handwriting.pdf](../data/documents/packet-01/06-handwriting.pdf) and [email-statement.pdf](../data/samples/email-statement.pdf). In the email, check `claimant_name = "Danielle Ortiz"` and `incident_date = 2026-02-12`, not the email's sent date. The five Extract fields contain stated facts; the two Generate fields provide readable, grounded synthesis rather than verbatim quotes. Inspect source highlights and confidence where returned; for generated text, they support the synthesis rather than prove every word is quoted. Missing facts must stay unset. Then **Build analyzer** with a unique ID such as `lab664_lee_statement`; record the actual `..._statement` ID for step 4.
+12. [] Wait until saving indicators clear, then select **Run analysis** to test the uploaded handwritten statement. Inspect the returned facts alongside the source document. If a fact is not stated in the document, check that the analyzer leaves the corresponding field empty rather than guessing a value.
+13. [] Select **Browse for Files**, navigate to C:\Users\LabUser\Desktop\ignite26-LAB664\data\samples, and upload [email-statement.pdf](../data/samples/email-statement.pdf). Run analysis again. In the email, check `claimant_name = "Danielle Ortiz"` and `incident_date = 2026-02-12`, not the email's sent date. The five Extract fields contain stated facts; the two Generate fields provide readable, grounded synthesis rather than verbatim quotes. Inspect source highlights and confidence where returned; for generated text, they support the synthesis rather than prove every word is quoted. If a fact is not stated in the document, check that the analyzer leaves the corresponding field empty rather than guessing a value.
+14. [] After reviewing both documents, **Build analyzer** with a unique ID such as `lab664_lee_statement`; record the actual `..._statement` ID for step 4.
 
 > [!Note] **Checkpoint:** tested custom repair and Statement analyzers are ready, and you have both analyzer IDs.
 
