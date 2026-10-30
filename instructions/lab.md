@@ -86,7 +86,7 @@ After import, verify **seven flat fields: five Extract and two Generate**, with 
 
 > [!Note] **Start with `data\step3`:** [classification-packet.pdf](../data/step3/classification-packet.pdf) (3 pages). Then use [packet-01.pdf](../data/step3/packet-01.pdf) (Danielle, 13 pages) and [packet-03.pdf](../data/step3/packet-03.pdf) (12 pages) for realistic logical-document boundaries.
 
-1. [] In [CU Studio Build](https://contentunderstanding.ai.azure.com/build), create a Preview **Classification** project with **GPT-5**. Add the four category keys and descriptions below. **Do not assign child analyzer IDs yet.** The [prebuilt-analyzer gallery](https://contentunderstanding.ai.azure.com/discover) will be used for extraction routes in step 4, not this classification-only test.
+1. [] Return to the **Build** tab in [CU Studio](https://contentunderstanding.ai.azure.com/build) and select **Create** to create another project. Set **API Version** to **2026-06-01 (Preview)**, **Workflow kind** to **Classification**, and the model to **GPT-5.5**, then select **Create**. Add the four category keys and descriptions below. **Do not assign child analyzer IDs yet.** The [prebuilt-analyzer gallery](https://contentunderstanding.ai.azure.com/discover) will be used for extraction routes in step 4, not this classification-only test.
 2. [] Enable segmentation and choose **Auto segment content**. Leave **Allow in-page segments** off. Do not choose **Segment by page**; keep parent content. The settings are `enableSegment=true`, `allowInPageSegments=false`, `segmentPerPage=false`, `omitContent=false`.
 
 | Category key | Copy this description |
@@ -111,7 +111,7 @@ After import, verify **seven flat fields: five Extract and two Generate**, with 
 
 > [!Note] **Use the same inputs from `data\step4`:** [classification-packet.pdf](../data/step4/classification-packet.pdf), [packet-01.pdf](../data/step4/packet-01.pdf) (statement and rental invoice), and [packet-03.pdf](../data/step4/packet-03.pdf) (towing invoice). This makes the before/after comparison about routing, not a changed source.
 
-1. [] Reopen your step 3 project in [CU Studio Build](https://contentunderstanding.ai.azure.com/build). Keep the classifier on **GPT-5** and the same logical-segmentation settings. Link the first three categories below to the indicated analyzers. Select prebuilts from the [prebuilt-analyzer gallery](https://contentunderstanding.ai.azure.com/discover); use your actual custom repair ID.
+1. [] Reopen your step 3 project in [CU Studio Build](https://contentunderstanding.ai.azure.com/build). Keep the classifier on **GPT-5.5** and the same logical-segmentation settings. Link the first three categories below to the indicated analyzers. Select prebuilts from the [prebuilt-analyzer gallery](https://contentunderstanding.ai.azure.com/discover); use your actual custom repair ID.
 2. [] Add `statement`, `towing_invoice`, and `rental_invoice`, using the descriptions below. Route Statement to your custom `..._statement` analyzer and both invoice categories to Invoice. Update Other's description to the new version. Keep both custom extractors on **GPT-5.5**. The resource's `prebuilt-analyzer-completion` mapping must use **GPT-5.2**; verify with the lab owner rather than changing a shared mapping.
 
 | Category key | Extraction route | Description change |
