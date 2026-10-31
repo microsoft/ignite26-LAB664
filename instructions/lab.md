@@ -86,8 +86,13 @@ After import, verify **seven flat fields: five Extract and two Generate**, with 
 
 > [!Note] **Start with `data\step3`:** [classification-packet.pdf](../data/step3/classification-packet.pdf) (3 pages). Then use [packet-01.pdf](../data/step3/packet-01.pdf) (Danielle, 13 pages) and [packet-03.pdf](../data/step3/packet-03.pdf) (12 pages) for realistic logical-document boundaries.
 
-1. [] Return to the **Build** tab in [CU Studio](https://contentunderstanding.ai.azure.com/build) and select **Create** to create another project. Set **API Version** to **2026-06-01 (Preview)**, **Workflow kind** to **Classification**, and the model to **GPT-5.5**, then select **Create**. Add the four category keys and descriptions below. **Do not assign child analyzer IDs yet.** The [prebuilt-analyzer gallery](https://contentunderstanding.ai.azure.com/discover) will be used for extraction routes in step 4, not this classification-only test.
-2. [] Enable segmentation and choose **Auto segment content**. Leave **Allow in-page segments** off. Do not choose **Segment by page**; keep parent content. The settings are `enableSegment=true`, `allowInPageSegments=false`, `segmentPerPage=false`, `omitContent=false`.
+So far, you have analyzed one document at a time. Now you will identify the document types and logical boundaries in a mixed packet, without extracting domain-specific fields. A page boundary is not always a document boundary: a multipage invoice should remain one document, while two adjacent supporting documents should remain separate.
+
+### Create the classification project and upload a packet
+
+1. [] Return to **Build** in [CU Studio](https://contentunderstanding.ai.azure.com/build) and select **Create**. Give the project a unique name, such as `lab664_lee_classifier`. Set **API Version** to **2026-06-01 (Preview)**, **Workflow kind** to **Classification**, and the model in **Advanced settings** to **GPT-5.5**, then select **Create**.
+2. [] In the new project, select **Browse for files**. Navigate to C:\Users\LabUser\Desktop\ignite26-LAB664\data\step3 and upload [classification-packet.pdf](../data/step3/classification-packet.pdf). **Upload first:** the routing-rule editor becomes available after a file is uploaded.
+3. [] In **Routing rules**, select **Add category**. Enter the first category's **Name** and **Description** from the table below. Complete both cells before selecting **Add category** again, and repeat for all four rows. Keep the keys exactly as shown. **Leave every Analyzer ID unassigned**; empty selectors are correct for this classification-only test.
 
 | Category key | Copy this description |
 |:---|:---|
@@ -96,10 +101,32 @@ After import, verify **seven flat fields: five Extract and two Generate**, with 
 | `repair_estimate` | A standalone repair workshop estimate or quote with vehicle details and proposed parts/labor. Keep continuation pages of the same estimate together; split a different estimate even if adjacent. Exclude towing/rental/glass invoices and their supporting inspection supplements even when they mention a proposed repair schedule. |
 | `other` | Each distinct supporting document: policy declarations/endorsements, claim intake forms, incident reports, handwritten statements, towing/rental/glass invoices with their own continuation supplements, valuation/downtime schedules, and workshop inspection records. Identify logical boundaries even when adjacent documents both have category other. Keep paginated continuation pages together; do not merge different document titles or identifiers. These documents are unrouted, not discarded. |
 
-3. [] Upload the [three-page core](../data/step3/classification-packet.pdf). Save and **Run analysis before building**. Expect ID on page 1, 1099-A on page 2, and repair estimate on page 3. Every page should be covered once. Domain extractor fields are not expected yet.
-4. [] Test [packet-01.pdf](../data/step3/packet-01.pdf), then [packet-03.pdf](../data/step3/packet-03.pdf). Inspect the category and page range of each logical document, not one segment per page. Compare to the individual source PDFs under `data\documents\packet-01` and `data\documents\packet-03`. Different adjacent Other documents must remain separate; a document's continuation pages should stay together.
-5. [] For packet 01, the authored groups are: membership card p1; policy p2-4; claim p5-6; incident p7; repair p8; statement p9; rental invoice p10-11; inspection p12; 1099-A p13. At this four-class stage, both the statement and rental invoice belong to Other. Review discrepancies rather than assuming authored grouping proves the model wrong.
-6. [] After testing, build a unique `..._classifier` analyzer if you want to call this stage from the app. Keep the editable project for step 4.
+4. [] In **Routing rules**, turn on **Enable segment**, then open **Segment Settings**. Select **Auto segment content**, leave **Allow in-page segments** off, and do not select **Segment by page**. Close the dialog and leave other settings unchanged. Parent content is retained by default. The corresponding settings are `enableSegment=true`, `allowInPageSegments=false`, `segmentPerPage=false`, and `omitContent=false`.
+5. [] Select **Save** and wait until saving indicators clear before changing tabs. Select **Run analysis** and remain in the project until it finishes. You do not need to build an analyzer before testing.
+
+### Inspect the small packet, then test the full packets
+
+6. [] Open **Test**. The **Segment** selector initially shows the retained parent, `input1`. Open it and select each `input1/segment...` entry to see its category and page range. Expect `id_document` on page 1, `tax_1099a` on page 2, and `repair_estimate` on page 3. Every page should be covered once. Classification-only child segments have **Result**, not domain extractor fields.
+7. [] To keep a before/after comparison, select the parent `input1`, then **Result** and **Download** to save the JSON. Download results before leaving the project or adding routes; reopening a saved project does not restore the displayed analysis results.
+8. [] Select **Browse for files**, upload [packet-01.pdf](../data/step3/packet-01.pdf) from the same folder, and select **Run analysis**. After it finishes, inspect each segment's category and page range. Compare the returned boundaries with the individual PDFs under C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-01.
+
+Use the authored document groups below as a reference:
+
+| Pages | Logical document | Category at this stage |
+|:---|:---|:---|
+| 1 | Membership card | `id_document` |
+| 2-4 | Policy | `other` |
+| 5-6 | Claim | `other` |
+| 7 | Incident report | `other` |
+| 8 | Repair estimate | `repair_estimate` |
+| 9 | Statement | `other` |
+| 10-11 | Rental invoice | `other` |
+| 12 | Inspection | `other` |
+| 13 | Form 1099-A | `tax_1099a` |
+
+9. [] Check that continuation pages stay together, while different adjacent documents remain separate even when both belong to `other`. The statement and rental invoice are Other at this stage; they are unrouted, not discarded. Download the parent result for comparison.
+10. [] Upload [packet-03.pdf](../data/step3/packet-03.pdf) from the same folder and run analysis. Review its 12 pages against C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-03, then download the parent result. Review discrepancies against the actual PDFs; the authored grouping is a reference, not proof that every different model boundary is wrong.
+11. [] If you want to compare classification-only output in the app later, select **Build analyzer** and use a unique ID ending in `_classifier`. After the build succeeds, choose **Stay in the project** to continue to step 4. Keep this editable project whether or not you build the optional analyzer.
 
 > [!Note] **Checkpoint:** you have categories and logical page ranges, but no extraction routes.
 
@@ -109,10 +136,12 @@ After import, verify **seven flat fields: five Extract and two Generate**, with 
 
 ## Step 4: Add extraction routes to the classifier
 
-> [!Note] **Use the same inputs from `data\step4`:** [classification-packet.pdf](../data/step4/classification-packet.pdf), [packet-01.pdf](../data/step4/packet-01.pdf) (statement and rental invoice), and [packet-03.pdf](../data/step4/packet-03.pdf) (towing invoice). This makes the before/after comparison about routing, not a changed source.
+> [!Note] **Reuse the uploaded packets:** the three PDFs in `data\step4` are identical to the ones in `data\step3`. Select their existing thumbnails in the project. If you need to upload them again, use [classification-packet.pdf](../data/step4/classification-packet.pdf), [packet-01.pdf](../data/step4/packet-01.pdf) (statement and rental invoice), and [packet-03.pdf](../data/step4/packet-03.pdf) (towing invoice). This keeps the before/after comparison about routing, not a changed source.
 
-1. [] Reopen your step 3 project in [CU Studio Build](https://contentunderstanding.ai.azure.com/build). Keep the classifier on **GPT-5.5** and the same logical-segmentation settings. Link the first three categories below to the indicated analyzers. Select prebuilts from the [prebuilt-analyzer gallery](https://contentunderstanding.ai.azure.com/discover); use your actual custom repair ID.
-2. [] Add `statement`, `towing_invoice`, and `rental_invoice`, using the descriptions below. Route Statement to your custom `..._statement` analyzer and both invoice categories to Invoice. Update Other's description to the new version. Keep both custom extractors on **GPT-5.5**. The resource's `prebuilt-analyzer-completion` mapping must use **GPT-5.2**; verify with the lab owner rather than changing a shared mapping.
+1. [] Continue in the editable step 3 project. If you left it, return to [CU Studio Build](https://contentunderstanding.ai.azure.com/build), open **Project list**, and open your project. Do not open the built classification-only analyzer from **Analyzer list** to edit its routing rules.
+2. [] Confirm you are using the same resource, the classifier is on **GPT-5.5**, and the two custom analyzers from step 2 are ready. Keep both custom extractors on **GPT-5.5** and use their actual IDs. The resource's `prebuilt-analyzer-completion` mapping must use **GPT-5.2**; verify with the lab owner rather than changing a shared mapping.
+3. [] Open **Routing rules**. In each existing category's **Analyzer ID** selector, choose the route in the table below. Use the selector's **Prebuilt** tab to search for the exact prebuilt ID, or **Custom** to find your built repair analyzer. For tax, choose the unversioned `prebuilt-tax.us.1099A`, not the year-specific entry. Selecting a route shows its schema preview within the project; you do not need to leave for the gallery.
+4. [] Select **Add category** and enter `statement` with its description below, then select your custom Statement analyzer through **Analyzer ID** > **Custom**. Repeat for `towing_invoice` and `rental_invoice`, selecting `prebuilt-invoice` through **Prebuilt** for each. Complete each name and description before adding the next row. Edit the existing `other` description to the new version below, but leave its Analyzer ID unassigned.
 
 | Category key | Extraction route | Description change |
 |:---|:---|:---|
@@ -120,13 +149,17 @@ After import, verify **seven flat fields: five Extract and two Generate**, with 
 | `tax_1099a` | `prebuilt-tax.us.1099A` | Keep the step 3 description. |
 | `repair_estimate` | Your `..._repair` ID | Keep the step 3 description. |
 | `statement` | Your `..._statement` ID | A handwritten or typed claimant statement or email describing the incident, claimant vehicle, and reported damage. Keep continuation pages of the same statement together. Exclude claim forms, incident reports, witness or other-driver accounts, and repair or invoice documents. |
-| `towing_invoice` | `prebuilt-invoice` | A towing or roadside-recovery invoice, bill or charge ledger for vehicle transport, storage or release. Keep continuation and release/custody supplements from the same bill together. Payment may be unpaid or pending; do not infer payment. Exclude repair estimates, rental billing, and glass or panel service quotes. |
+| `towing_invoice` | `prebuilt-invoice` | A towing or roadside-recovery invoice, bill or charge ledger for vehicle transport, storage or release. Keep continuation and release/custody supplements from the same bill together. Payment may be unpaid or pending; do not infer payment. Exclude repair estimates, rental billing, and glass or panel service quotes. Include towing/recovery/security charge supplements that list service charges or a total due, even when they also contain inspection details or repair-quote references. |
 | `rental_invoice` | `prebuilt-invoice` | A vehicle rental billing document or invoice with rental agreement references, dates or daily charges. Keep the same agreement's pickup/billing/vehicle-condition continuation pages together. Payment may be unpaid or pending; do not infer payment. Exclude towing bills, repair estimates, and glass or panel service quotes. |
-| `other` | **No route** | Each distinct unrouted supporting document: policy declarations/endorsements, claim intake forms, incident reports, glass/panel service supporting records, valuation/downtime schedules, and workshop inspection records. Statements, towing bills, and rental billing belong to their named categories, not Other. Identify logical boundaries even when adjacent documents both have category other. Keep continuation pages together; do not merge different titles or identifiers. These documents are unrouted, not discarded. |
+| `other` | **No route** | Each distinct unrouted supporting document: policy declarations/endorsements, claim intake forms, incident reports, glass/panel service supporting records, valuation/downtime schedules, and workshop inspection records. Statements, towing bills, and rental billing belong to their named categories, not Other. Identify logical boundaries even when adjacent documents both have category other. Keep continuation pages together; do not merge different titles or identifiers. These documents are unrouted, not discarded. Exclude towing/recovery/security charge supplements; classify those as towing_invoice. |
 
-3. [] Save and **Run analysis in Studio before building**, first on the core packet and then on both full packets. Compare categories and ranges with step 3, now with child fields and source highlights. Statement, rental, and towing have moved out of Other; other logical boundaries should remain meaningful.
-4. [] For the core packet, inspect ID p1, nested tax fields p2, and the three custom repair fields p3. For packet 01, inspect repair p8, the native Statement route on p9, and rental p10-11. Inspect the towing invoice in packet 03. Keep reported statement details distinct from verified facts, and the proposed repair amount distinct from actual invoiced charges.
-5. [] Only after review, **Build analyzer** with a new unique `..._router` ID. This is the ready seven-category demo router; do not overwrite the classification-only analyzer. Wait for status **ready** and record this exact ID and the resource endpoint for step 5.
+5. [] Verify there are **seven categories and six assigned routes**, with no route for `other`. Keep **Enable segment** on, **Auto segment content** selected, **Allow in-page segments** off, and **Segment by page** unselected. Select **Save** and wait until saving indicators clear.
+6. [] Select the existing **classification-packet.pdf** thumbnail, then **Run analysis**. Wait for completion before inspecting results or selecting another file. Test the routing in Studio before building the router.
+7. [] In **Test**, open **Segment** and select the child content you want to inspect, then open **Fields**. The parent `input1` is not the child extractor's field view. Inspect ID fields on page 1, nested 1099-A fields on page 2, and custom `vehicle`, `vin`, and `odometer` fields on page 3. The tax route adds nested year/copy segment entries; select the nested entry with a **Fields** tab. These are not extra input documents. Select a field label to inspect its source highlight. Return to `input1` > **Result** and download the routed result separately from the step 3 JSON.
+8. [] Select **packet-01.pdf** and run analysis. Compare categories and page ranges with step 3, then inspect repair on page 8, the Statement route on page 9, and the rental invoice across pages 10-11. The statement and rental invoice now have their named categories and child fields rather than belonging to Other. Check that the rental continuation remains part of the same invoice. Download the parent result.
+9. [] Select **packet-03.pdf** and run analysis. Inspect the Statement route on page 9 and the towing invoice on page 10, along with the other categories and logical boundaries. Check invoice amounts against the towing supplement's **$237 charge**, not the separate **$1,699.04 repair quote** it references. Download the parent result. Other documents remain in the parent content without a domain extraction route.
+10. [] Compare returned fields with their source documents. Keep claimant-reported details distinct from verified facts, and proposed repair amounts distinct from invoiced charges or proof of payment. If a fact is not stated, check that its field is unset rather than invented; turn off **Hide missing fields** to see fields marked **Not found**.
+11. [] After reviewing all three packets, select **Build analyzer** with a new unique ID ending in `_router`. Do not overwrite the classification-only analyzer. After a successful build, use **Jump to analyzer list**. Close the analyzer-details dialog if it opens, then verify this exact analyzer has status **Ready**. Record its ID and your resource endpoint for step 5.
 
 > [!Note] **Checkpoint:** a tested, ready router links every non-Other category to extraction.
 
