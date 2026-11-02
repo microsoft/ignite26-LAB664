@@ -1,14 +1,20 @@
 @lab.Title
 
-## Welcome to Your Lab Environment
+## Welcome to your lab environment
 
 To begin, log into the virtual machine using the following credentials: +++@lab.VirtualMachine(Win11-Pro-Base).Password+++
 
-**Note:** Text formatted as an +++example+++ represents type text. Clicking on this text will automatically insert it to prevent any typing errors.
+**Note:** Select an insertable value to enter it without typing. Bold text identifies controls to select or results to inspect, not text to enter.
 
-# From documents to an Insurance Workbench
+# From documents to an insurance workbench
 
-In this lab you will use Azure AI Content Understanding to turn synthetic insurance documents into structured, source-linked results. You will build and test analyzers in CU Studio, then connect your finished analyzer to a **separate Insurance Workbench application**. Along the way, you will:
+This lab builds on document extraction concepts from Azure AI Document Intelligence and uses Azure Content Understanding (CU) to turn synthetic insurance documents into structured, source-linked results. You'll build and test analyzers in Content Understanding Studio (CU Studio), then connect your finished analyzer to a **separate Insurance Workbench application**.
+
+Imagine you're reviewing an insurance claim. Open the supplied [customer packet](../data/step3/packet-01.pdf) and browse its 13 pages: a membership card, policy, claim form, incident report, repair estimate, handwritten statement, rental invoice, inspection, and tax form. Your goal is to identify each logical document, extract the details needed for claim review, and trace those details back to their source pages. A two-page invoice must stay together, and a proposed repair amount must remain distinct from an invoiced charge or proof of payment.
+
+An **analyzer** is a reusable configuration that tells CU how to process content. An extraction analyzer defines which fields to return and how to extract or generate them. A classification analyzer identifies document categories and boundaries; adding extraction routes sends each category to its corresponding analyzer. A Studio project is where you edit and test that configuration before building an analyzer for the app to use.
+
+Along the way, you'll:
 
 - **Explore prebuilt analyzers:** compare document layout with pre-built extraction models, and inspect how returned values relate to the source documents.
 - **Customize extraction:** extend an invoice template to extract vehicle, VIN, and odometer details from a repair estimate, then build a Statement analyzer that combines extracted facts with grounded summaries.
@@ -20,10 +26,10 @@ In this lab you will use Azure AI Content Understanding to turn synthetic insura
 
 ## Step 1: Explore prebuilt analyzers
 
-To get started, let's explore the prebuilt analyzers in CU (Content Understanding) Studio by uploading and analyzing a few sample documents.
+To get started, explore the prebuilt analyzers in CU Studio by uploading and analyzing a few sample documents.
 This will help you understand the distinction between layout extraction and schema-based extraction before you move on to customizing your own analyzers.
 
-Open the browser to navigate to CU the Studio Gallery (```https://contentunderstanding.ai.azure.com/discover```).
+Open the browser and navigate to the CU Studio gallery: +++https://contentunderstanding.ai.azure.com/discover+++.
 Click **Sign in** on the top right corner of the page and log in with the provided credentials for Azure:
 - Username: +++@lab.CloudPortalCredential(User1).Username+++
 - If prompted for a Temporary Access Pass (TAP): +++@lab.CloudPortalCredential(User1).AccessToken+++
@@ -33,13 +39,14 @@ Once done, follow the steps below to explore the prebuilt analyzers:
 1. Click on **Layout** to test the document layout extraction. When prompted to confirm the details of the subscription, resource group and resource name, confirm default selections and proceed. Click **Next**->**Save**.
 2. You'll get a list of samples for different content types (checklist, financial report, formulas, etc). Select a sample to see the original document scan and how the prebuilt analyzer extracts information from it.
 !IMAGE[chshn4cn.png](instructions359897/chshn4cn.png)
-4. Next click on **Browse for files** to upload your own document for analysis. In the File Explorer window that opens, navigate to ```C:\Users\LabUser\Desktop\ignite26-LAB664\data\step1``` and select **towing-invoice.pdf**. Notice how both the content and the format (tables, lists, headers) are extracted and displayed on the right side panel.
+3. Select **Browse for files** to upload your own document for analysis. In the File Explorer window that opens, navigate to +++C:\Users\LabUser\Desktop\ignite26-LAB664\data\step1+++ and select **towing-invoice.pdf**. Notice how both the content and the format (tables, lists, headers) are extracted and displayed on the right side panel.
 !IMAGE[xfe4ei8u.png](instructions359897/xfe4ei8u.png)
 
-Now come back to the previous page - by clicking on the arrow on the top left corner of the page - and let's examine the differences between the prebuilt layout extraction and the schema-based extraction for the same document. 
-1. Scroll down on the **Procurement** section to locate the **Invoice** prebuilt analyzer and click on it to open the details.
-2. Inspect the default sample to understand how the schema-based extraction identifies and extracts specific fields relevant to the document type, such as **AmontDue**, **BalanceForward** and **Billing Address**. Note that each field is also mapped to the corresponding confidence score.
-3. Now upload the same **towing-invoice.pdf** document to see how the schema-based extraction applies to your own file. Compare the extracted fields and confidence scores with the layout extraction results you've got in the previous step to understand the differences.
+Next, compare layout extraction with schema-based extraction for the same document.
+1. Select the **Back** arrow in the upper-left corner of the Studio page to return to the gallery.
+2. In the gallery, scroll down to **Procurement**, then select **Invoice**.
+3. Inspect the default sample to see how schema-based extraction identifies specific fields, such as **AmountDue**, **BalanceForward**, and **Billing Address**, with corresponding confidence scores.
+4. Upload the same **towing-invoice.pdf** document. Compare its extracted fields and confidence scores with the layout results from the previous exercise.
 
 Feel free to experiment with further pre-built analyzers to understand how CU Studio handles different document types and extraction scenarios. Below you can find a few examples of prebuilt analyzers along with the sample documents provided in the data folder, and the fields they extract.
 
@@ -60,73 +67,63 @@ For this step, use the **gpt-5.5** model instance pre-provisioned and mapped by 
 
 1. Move from the **Discover** to the **Build** tab, by selecting it on the top right corner of the blue top navigation bar.
 2. Click on **Create** to start building your custom repair extractor.
-3. Name the project as `custom-repair-extractor`.
-4. Select `2026-06-01 (Preview)` as the API version and `Standard Extraction` as the workflow type.
+3. Enter +++custom-repair-extractor+++ as the project name.
+4. Select **2026-06-01 (Preview)** as the API version and **Standard Extraction** as the workflow type.
 !IMAGE[kke6gm3z.png](instructions359897/kke6gm3z.png)
-6. Expand the **Advanced settings** section and select **gpt-5.5** as model.
-7. Leave the other parameters as default and confirm by selecting **Create**.
+5. Expand the **Advanced settings** section and select **gpt-5.5** as the model.
+6. Leave the other parameters at their defaults and select **Create**.
 !IMAGE[qm5a1m18.png](instructions359897/qm5a1m18.png)
-7. Once your project is created, select **Browse for Files** and upload ```C:\Users\LabUser\Desktop\ignite26-LAB664\data\step1\repair-estimate.pdf```. **Run analysis**.
+7. Once your project is created, select **Browse for Files** and upload +++C:\Users\LabUser\Desktop\ignite26-LAB664\data\step2\repair-estimate.pdf+++. Select **Run analysis**.
 8. In the **Choose a template window**, select the **Invoice** one. Click on **Save** to proceed.
 9. Add **these three lowercase fields**, with method **Extract**, one by one. For each field, enter the field's **Name** and **Description** from the table below. Complete both cells before selecting **Add field** again, and repeat for all three rows.
 
 | Field | Type / method | Copy this description |
 |:---|:---|:---|
-| `vehicle` | String / Extract | `Printed vehicle name as one string, including year/make/model when present. Do not add color, decode the VIN, or infer missing details.` |
-| `vin` | String / Extract | `Exact value explicitly labeled VIN. Do not correct it or substitute registration, plate, or account numbers. Leave unset if absent.` |
-| `odometer` | Number / Extract | `Printed Odometer or Inspection Mileage as a number. Remove grouping separators; no units. Do not substitute Annual Mileage or infer an absent value.` |
+| +++vehicle+++ | String / Extract | +++Printed vehicle name as one string, including year/make/model when present. Do not add color, decode the VIN, or infer missing details.+++ |
+| +++vin+++ | String / Extract | +++Exact value explicitly labeled VIN. Do not correct it or substitute registration, plate, or account numbers. Leave unset if absent.+++ |
+| +++odometer+++ | Number / Extract | +++Printed Odometer or Inspection Mileage as a number. Remove grouping separators; no units. Do not substitute Annual Mileage or infer an absent value.+++ |
 10. Click on **Save** to confirm the added fields.
 !IMAGE[y1l65rn4.png](instructions359897/y1l65rn4.png)
 11. **Run analysis**.
 !IMAGE[ctdjrztc.png](instructions359897/ctdjrztc.png)
-12. In the analysis results, verify the saved schema contains the three fields above: `vehicle = "2019 Toyota Corolla LE"`, `vin = "5YFEPMAE3KA513905"`, `odometer = 94360`. The repair proposal total is $1,310.13. 
-13. After the test passes, click on **Build analyzer** and name it `repair_extractor_analyzer`. Add as description `Extractor for repair estimates based on uploaded documents`.Select **Build** to complete the process.
+12. Inspect the returned values rather than entering them: **vehicle** should be **2019 Toyota Corolla LE**, **vin** should be **5YFEPMAE3KA513905**, and **odometer** should be **94360**. The repair proposal total is **$1,310.13**.
+13. After reviewing the results, select **Build analyzer**. Enter +++repair_extractor_analyzer+++ as the name and +++Extractor for repair estimates based on uploaded documents+++ as the description. Select **Build**.
 !IMAGE[eli9ysmu.png](instructions359897/eli9ysmu.png)
 14. Once you are prompted with 'Built successfully', your analyzer is ready for use. Click on **Jump to analyzer list** to verify the analyzer details. You'll find your newly created analyzer in the **Analyzer list**.
 !IMAGE[22c2gk9p.png](instructions359897/22c2gk9p.png)
 
-### Add a custom Statement extractor
+### Add a custom statement extractor
 
 Now let's work with a different kind of document: a claimant's account of an incident. Unlike an invoice, a statement may describe the same damage in several places or leave important details unstated. You will use **Extract** for facts explicitly present in the document and **Generate** for a concise, grounded synthesis of the narrative.
 
 Instead of entering each field manually, you will import a prepared schema and inspect how its field descriptions constrain the result.
 
-1. Return to the **Build** tab -> **Project list** and create a second **Standard Extraction** project using the '2026-06-01 (Preview)' API version. Name it `custom-statement-extractor`.
+1. Return to **Build** > **Project list** and create a second **Standard Extraction** project using the **2026-06-01 (Preview)** API version. Enter +++custom-statement-extractor+++ as its name.
 2. In **Advanced settings**, select **gpt-5.5**, then select **Create**.
-3. Click on **Browse for Files**. Within the File Explorer window, navigate to `C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-01` and upload `06-handwriting.pdf`.
+3. Select **Browse for Files**. In the File Explorer window, navigate to +++C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-01+++ and select **06-handwriting.pdf**.
 4. In the pop-up that appears after the document upload, keep **Document Analysis** as selected template, disable **AI-Powered field suggestions**, then select **Save**.
 !IMAGE[szpjguew.png](instructions359897/szpjguew.png)
-5. In the field-schema toolbar, choose **Import**, navigate to `C:\Users\LabUser\Desktop\ignite26-LAB664\data\step2`, and select `statement-schema.json`. Confirm schema replacement if prompted, then **Save**. This imports the fields and descriptions; no field-by-field typing is needed.
+5. In the field-schema toolbar, choose **Import**, navigate to +++C:\Users\LabUser\Desktop\ignite26-LAB664\data\step2+++, and select **statement-schema.json**. Confirm schema replacement if prompted, then select **Save**. This imports the fields and descriptions; no field-by-field typing is needed.
 !IMAGE[03cudcq2.png](instructions359897/03cudcq2.png)
 
-You should have **seven flat fields: five Extract and two Generate**, with **Source & Confidence** enabled. *Do not add these fields again*.
-
-| Field | Type / method | What to check |
-|:---|:---|:---|
-| `claimant_name` | String / Extract | Identifies the claimant or insured vehicle owner, not a witness, other driver, adjuster, or recipient. |
-| `incident_date` | Date / Extract | Uses the incident date, not the date the statement or email was written or sent. |
-| `incident_location` | String / Extract | Contains only an explicitly reported incident location. |
-| `vehicle` | String / Extract | Describes the claimant's vehicle as one string, without color, the other vehicle, or inferred details. |
-| `vin` | String / Extract | Preserves the exact stated VIN without decoding, correcting, or inferring it. |
-| `reported_damage` | String / Generate | Combines claimant-reported damage into a concise description, without presenting it as inspected or verified. |
-| `summary` | String / Generate | Summarizes the narrative while preserving uncertainty, without inferring fault, coverage, liability, or payment. |
+Inspect the imported schema: **seven flat fields, five Extract and two Generate**, with **Source & Confidence** enabled. These fields are already imported; don't add them again. Read the descriptions for **incident_date**, **reported_damage**, and **summary** to see how they distinguish stated facts from grounded synthesis without inferring fault, coverage, or payment.
 
 6. Wait until saving indicators clear, then select **Run analysis** to test the uploaded handwritten statement. Inspect the returned facts alongside the source document.
-   - In the statement, check `claimant_name = "Danielle Ortiz"` and `incident_date = 2026-02-12`. The incident date should not be replaced by the letter's sent date.
+   - Check that **claimant_name** is **Danielle Ortiz** and **incident_date** is **2026-02-12**. The incident date is February 12, not the February 13 date at the top of the letter. These are expected results, not values to enter.
    - The five *Extract* fields contain stated facts; the two *Generate* fields provide readable, grounded synthesis rather than verbatim quotes.
    - Inspect source highlights and confidence where returned. 
    - If a fact is not stated in the document, check that the analyzer leaves the corresponding field empty rather than guessing a value.
 
 > [!Tip] 
-> Make sure to disable the **Hide missing fields** toggle to view all fields, including those that are not populated in the current document.
+> Leave **Hide missing fields** off to see fields that aren't populated. If you previously turned it on, turn it off.
 >
 > !IMAGE[33b9kcoj.png](instructions359897/33b9kcoj.png)
 
 Next, test the same schema against a typed email:
 
-1. Select **Browse for Files** and upload `C:\Users\LabUser\Desktop\ignite26-LAB664\data\samples\email-statement.pdf`. Save the project, wait for saving to finish, then select **Run analysis**.
-2. Perform the same checks as in the handwritten statement. 
-3. After reviewing both documents, select **Build analyzer** and enter a new unique ID, for example `statement_extractor_analyzer`. Add as a description `Custom analyzer for extracting facts from handwritten and typed statements.` In the **Analyzer list**, you should now see two custom analyzers, as in the screenshot below.
+1. Select **Browse for Files** and upload +++C:\Users\LabUser\Desktop\ignite26-LAB664\data\samples\email-statement.pdf+++. Save the project, wait for saving to finish, then select **Run analysis**.
+2. Perform the same checks as in the handwritten statement. The incident date remains **2026-02-12**, not the email's February 13 sent date.
+3. After reviewing both documents, select **Build analyzer**. Enter a new unique ID, for example +++statement_extractor_analyzer+++, and the description +++Custom analyzer for extracting facts from handwritten and typed statements.+++ In the **Analyzer list**, you should now see two custom analyzers, as in the screenshot below.
 !IMAGE[516v1pe7.png](instructions359897/516v1pe7.png)
 
 > [!Note] **Checkpoint:** your custom repair and statement analyzers have both been tested and built, and you have recorded both analyzer IDs.
@@ -135,16 +132,16 @@ Next, test the same schema against a typed email:
 
 ## Step 3: Classify and split a packet, without extraction
 
-So far, you have analyzed one document at a time. An insurance submission usually contains several documents, often with different formats and multiple pages. In this step, you will create a classifier that identifies document types and splits a packet into logical documents before extracting any fields.
+So far, you've analyzed one document at a time. Return to the customer packet from the introduction: the app needs repair, statement, and invoice details from the same PDF, not just its raw text. First, create a classifier that identifies document types and splits the packet into logical documents. In step 4, you'll route those documents to extraction analyzers.
 
 You will start with a small three-page packet, then test the same configuration against two larger packets. This will help you see the difference between a page boundary and a document boundary.
 
 ### Create the classification project
 
-1. Return to **Build**->**Project List** in CU Studio and create a new **Classification** project, named `packet_classifier`. Make sure to configure the API version to *Preview* first.
+1. Return to **Build** > **Project list** in CU Studio. Select **Create**, choose **2026-06-01 (Preview)** before selecting **Classification**, and enter +++packet_classifier+++ as the project name.
 !IMAGE[9maoqxjx.png](instructions359897/9maoqxjx.png)
 2. In **Advanced settings**, select **gpt-5.5** as **Model for Analysis** and create the project.
-3. In the new project, select **Browse for files**. Navigate to `C:\Users\LabUser\Desktop\ignite26-LAB664\data\step3` and upload `classification-packet.pdf`.
+3. In the new project, select **Browse for files**. Navigate to +++C:\Users\LabUser\Desktop\ignite26-LAB664\data\step3+++ and select **classification-packet.pdf**.
  
 > [!Note] **Upload first:** the routing-rule editor becomes available after a file is uploaded.
 
@@ -155,10 +152,10 @@ You will start with a small three-page packet, then test the same configuration 
 
 | Category key | Copy this description |
 |:---|:---|
-| `id_document` | `The lab's identity-like demo card with named holder, portrait and membership identifier. This synthetic membership card demonstrates ID field extraction, not government-ID authenticity. Exclude invoice, tax and repair documents.` |
-| `tax_1099a` | `An IRS Form 1099-A Acquisition or Abandonment of Secured Property, including fictional borrower-copy examples. Exclude other tax forms and prose references.` |
-| `repair_estimate` | `A standalone repair workshop estimate or quote with vehicle details and proposed parts/labor. Keep continuation pages of the same estimate together; split a different estimate even if adjacent. Exclude towing/rental/glass invoices and their supporting inspection supplements even when they mention a proposed repair schedule.` |
-| `other` | `Each distinct supporting document: policy declarations/endorsements, claim intake forms, incident reports, handwritten statements, towing/rental/glass invoices with their own continuation supplements, valuation/downtime schedules, and workshop inspection records. Identify logical boundaries even when adjacent documents both have category other. Keep paginated continuation pages together; do not merge different document titles or identifiers. These documents are unrouted, not discarded.` |
+| +++id_document+++ | +++The lab's identity-like demo card with named holder, portrait and membership identifier. This synthetic membership card demonstrates ID field extraction, not government-ID authenticity. Exclude invoice, tax and repair documents.+++ |
+| +++tax_1099a+++ | +++An IRS Form 1099-A Acquisition or Abandonment of Secured Property, including fictional borrower-copy examples. Exclude other tax forms and prose references.+++ |
+| +++repair_estimate+++ | +++A standalone repair workshop estimate or quote with vehicle details and proposed parts/labor. Keep continuation pages of the same estimate together; split a different estimate even if adjacent. Exclude towing/rental/glass invoices and their supporting inspection supplements even when they mention a proposed repair schedule.+++ |
+| +++other+++ | +++Each distinct supporting document: policy declarations/endorsements, claim intake forms, incident reports, handwritten statements, towing/rental/glass invoices with their own continuation supplements, valuation/downtime schedules, and workshop inspection records. Identify logical boundaries even when adjacent documents both have category other. Keep paginated continuation pages together; do not merge different document titles or identifiers. These documents are unrouted, not discarded.+++ |
 
 Next, configure how the classifier separates documents:
 
@@ -168,7 +165,7 @@ Next, configure how the classifier separates documents:
 > [!Note] With the configured settings, a two-page rental invoice should remain one logical document. Two adjacent documents should still be separate, even when both belong to `other`.
 
 2. Select **Save** and wait until saving indicators clear before changing tabs. Select **Run analysis** and remain in the project until it finishes. Inspect the results to ensure documents are segmented correctly.
-3. Inspect details in **Test** tab. The **Segment** selector initially shows the retained parent, `input1`. Open it and select each `input1/segment...` entry to see its category and page range. Expect `id_document` on page 1, `tax_1099a` on page 2, and `repair_estimate` on page 3. Every page should be covered once. Classification-only child segments have **Result**, not domain extractor fields.
+3. In **Test**, inspect the **classification and page count** shown for each segment. The **Segment** selector initially shows the retained parent, **input1**. Open it and select each child segment to see its category and page range. Expect **id_document** on page 1, **tax_1099a** on page 2, and **repair_estimate** on page 3: one page each. Every page should be covered once. Classification-only child segments have **Result**, not domain extractor fields.
 !IMAGE[s51l89mw.png](instructions359897/s51l89mw.png)
 4. To keep a before/after comparison, select the parent `input1`, then **Result** and **Download** to save the JSON. 
 !IMAGE[n0m86b6w.png](instructions359897/n0m86b6w.png)
@@ -179,8 +176,8 @@ Next, configure how the classifier separates documents:
 
 In the previous step, you tested a small packet to ensure the classifier correctly segments individual documents. Now, you will test the full customer packet to verify the classifier's behavior on larger, multi-document files.
 
-1. Within the same project, select again **Browse for Files** and upload `C:\Users\LabUser\Desktop\ignite26-LAB664\data\step3\packet-01.pdf`. 
-2. Click on **Run analysis**. After it finishes, inspect each segment's category and page range. Compare the returned boundaries with the individual PDFs under `C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-01`. Use the authored document groups below as a reference:
+1. Within the same project, select **Browse for Files** and upload +++C:\Users\LabUser\Desktop\ignite26-LAB664\data\step3\packet-01.pdf+++.
+2. Select **Run analysis**. After it finishes, inspect each segment's classification, page count, and page range. Compare the returned boundaries with the individual PDFs under `C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-01`. Use the authored document groups below as a reference:
 
 | Pages | Logical document | Category at this stage |
 |:---|:---|:---|
@@ -196,11 +193,11 @@ In the previous step, you tested a small packet to ensure the classifier correct
 
 3. Check that continuation pages stay together, while different adjacent documents remain separate even when both belong to `other`. The statement and rental invoice are Other at this stage; they are unrouted, not discarded. Download the parent result for comparison, as you've done in the previous step.
 
-> [!Tip] You can easily check the pages assigned to each segment, by looking at the label below the segment name.
+> [!Tip] Below each segment name, inspect its classification and page count. For example, the rental invoice should span **two pages, 10-11**, as one logical document.
 > !IMAGE[vcl16bde.png](instructions359897/vcl16bde.png)
 
-4. Next, upload `packet-03.pdf` from the same folder and run analysis. Review its 12 pages against the individual files in `C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-03`, then download the parent result. Use the table above as a reference for expected page ranges and categories.
-5. Before moving to the next step, select **Build analyzer** and use a unique ID such as `packet_classifier`. Also include a description, for example, `Classifier for multi-document analysis`.
+4. Next, upload **packet-03.pdf** from the same folder and run analysis. Review its 13 pages against the individual files in `C:\Users\LabUser\Desktop\ignite26-LAB664\data\documents\packet-03`, then download the parent result. Use the same boundary checks as for packet 01, but don't reuse its page ranges: the two separate repair estimates are on **pages 8 and 9**, the statement is on **page 10**, and the towing invoice is on **page 11**.
+5. Before moving to the next step, select **Build analyzer** and enter a unique ID such as +++packet_classifier+++. Enter +++Classifier for multi-document analysis+++ as the description.
 6. After the build succeeds, choose **Stay in the project** to continue.
 
 > [!Note] **Checkpoint:** you can identify categories and logical page ranges in a mixed packet. No extraction routes have been assigned yet.
@@ -222,18 +219,18 @@ In the previous step, you tested a small packet to ensure the classifier correct
 | `id_document` | `prebuilt-idDocument.generic` | Keep the step 3 description. |
 | `tax_1099a` | `prebuilt-tax.us.1099A` | Keep the step 3 description. |
 | `repair_estimate` | Your `repair_extractor_analyzer` ID | Keep the step 3 description. |
-| `other` | **No route** | Each distinct unrouted supporting document: policy declarations/endorsements, claim intake forms, incident reports, glass/panel service supporting records, valuation/downtime schedules, and workshop inspection records. Statements, towing bills, and rental billing belong to their named categories, not Other. Identify logical boundaries even when adjacent documents both have category other. Keep continuation pages together; do not merge different titles or identifiers. These documents are unrouted, not discarded. Exclude towing/recovery/security charge supplements; classify those as towing_invoice. |
+| `other` | **No route** | +++Each distinct unrouted supporting document: policy declarations/endorsements, claim intake forms, incident reports, glass/panel service supporting records, valuation/downtime schedules, and workshop inspection records. Statements, towing bills, and rental billing belong to their named categories, not Other. Identify logical boundaries even when adjacent documents both have category other. Keep continuation pages together; do not merge different titles or identifiers. These documents are unrouted, not discarded. Exclude towing/recovery/security charge supplements; classify those as towing_invoice.+++ |
 
 3. Select **Add category** and enter `statement` with its description below, then select your custom Statement analyzer through **Analyzer ID** > **Custom**. Repeat for `towing_invoice` and `rental_invoice`, selecting `prebuilt-invoice` through **Prebuilt** for each. Complete each name and description before adding the next row.
 !IMAGE[ujvd6zg6.png](instructions359897/ujvd6zg6.png)
 
 | Category key | Extraction route | Description change |
 |:---|:---|:---|
-| `statement` | Your `statement_extractor_analyzer` ID | A handwritten or typed claimant statement or email describing the incident, claimant vehicle, and reported damage. Keep continuation pages of the same statement together. Exclude claim forms, incident reports, witness or other-driver accounts, and repair or invoice documents. |
-| `towing_invoice` | `prebuilt-invoice` | A towing or roadside-recovery invoice, bill or charge ledger for vehicle transport, storage or release. Keep continuation and release/custody supplements from the same bill together. Payment may be unpaid or pending; do not infer payment. Exclude repair estimates, rental billing, and glass or panel service quotes. Include towing/recovery/security charge supplements that list service charges or a total due, even when they also contain inspection details or repair-quote references. |
-| `rental_invoice` | `prebuilt-invoice` | A vehicle rental billing document or invoice with rental agreement references, dates or daily charges. Keep the same agreement's pickup/billing/vehicle-condition continuation pages together. Payment may be unpaid or pending; do not infer payment. Exclude towing bills, repair estimates, and glass or panel service quotes. |
+| +++statement+++ | Your `statement_extractor_analyzer` ID | +++A handwritten or typed claimant statement or email describing the incident, claimant vehicle, and reported damage. Keep continuation pages of the same statement together. Exclude claim forms, incident reports, witness or other-driver accounts, and repair or invoice documents.+++ |
+| +++towing_invoice+++ | `prebuilt-invoice` | +++A towing or roadside-recovery invoice, bill or charge ledger for vehicle transport, storage or release. Keep continuation and release/custody supplements from the same bill together. Payment may be unpaid or pending; do not infer payment. Exclude repair estimates, rental billing, and glass or panel service quotes. Include towing/recovery/security charge supplements that list service charges or a total due, even when they also contain inspection details or repair-quote references.+++ |
+| +++rental_invoice+++ | `prebuilt-invoice` | +++A vehicle rental billing document or invoice with rental agreement references, dates or daily charges. Keep the same agreement's pickup/billing/vehicle-condition continuation pages together. Payment may be unpaid or pending; do not infer payment. Exclude towing bills, repair estimates, and glass or panel service quotes.+++ |
 
-4. Verify there are **seven categories and six assigned routes**, with no route for `other`. Keep **Enable segment** on and click on the gear icon to verify the settings. Keep **Auto segment content** selected, **Allow in-page segments** off, and **Segment by page** unselected. 
+4. Verify there are **seven categories and six assigned routes**, with no route for `other`. Keep **Enable segment** on and retain the segmentation settings from step 3; there's no need to reopen the settings panel if you haven't changed them.
 !IMAGE[bj0sbmti.png](instructions359897/bj0sbmti.png)
 5. Select **Save** and wait until saving indicators clear.
 6. Select the existing **classification-packet.pdf** thumbnail, then **Run analysis**. Wait for completion before inspecting results or selecting another file. 
@@ -246,9 +243,9 @@ Inspect ID fields on segment 1, nested 1099-A fields on segment 2, and custom `v
 8. Return to `input1` > **Result** and download the routed result separately from the step 3 JSON.
 9. Replicate the same process for the other 2 files:
    - Select **packet-01.pdf** and run analysis. Compare categories and page ranges with step 3, then inspect repair on page 8, the Statement route on page 9, and the rental invoice across pages 10-11. The statement and rental invoice now have their named categories and child fields rather than belonging to Other. Check that the rental continuation remains part of the same invoice. Download the parent result.
-   - Select **packet-03.pdf** and run analysis. Inspect the Statement route on page 9 and the towing invoice on page 10, along with the other categories and logical boundaries. Check invoice amounts against the towing supplement's **$237 charge**, not the separate **$1,699.04 repair quote** it references. Download the parent result. Other documents remain in the parent content without a domain extraction route.
-10. Compare returned fields with their source documents. Keep claimant-reported details distinct from verified facts, and proposed repair amounts distinct from invoiced charges or proof of payment. If a fact is not stated, check that its field is unset rather than invented; turn off **Hide missing fields** to see fields marked **Not found**.
-11. After reviewing all three packets, select **Build analyzer** with a new unique ID, such as `router_analyzer`. Do not overwrite the classification-only analyzer you created in the previous step. After a successful build, use **Jump to analyzer list**. Verify this exact analyzer has status **Ready**. Record its ID and your resource endpoint for step 5.
+   - Select **packet-03.pdf** and run analysis. Inspect the two repair estimates on **pages 8 and 9**, the Statement route on **page 10**, and the towing invoice on **page 11**, along with the other categories and logical boundaries. Check invoice amounts against the towing supplement's **$237 charge**, not the separate **$1,699.04 repair quote** it references. Download the parent result. Other documents remain in the parent content without a domain extraction route.
+10. Compare returned fields with their source documents. Keep claimant-reported details distinct from verified facts, and proposed repair amounts distinct from invoiced charges or proof of payment. If a fact isn't stated, check that its field is unset rather than invented. Leave **Hide missing fields** off to see fields marked **Not found**; change it only if you previously turned it on.
+11. After reviewing all three packets, select **Build analyzer** and enter a new unique ID, such as +++router_analyzer+++. Do not overwrite the classification-only analyzer you created in the previous step. After a successful build, use **Jump to analyzer list**. Verify this exact analyzer has status **Ready**. Record its ID and your resource endpoint for step 5.
 
 > [!Note] **Checkpoint:** a tested, ready router links every non-Other category to extraction.
 
@@ -256,7 +253,7 @@ Inspect ID fields on segment 1, nested 1099-A fields on segment 2, and custom `v
 
 ## Step 5: Connect to your separate Insurance Workbench app
 
-In the final step, you will move from authoring analyzers to reviewing their results in an application. The Insurance Workbench loads ten customer packets, totaling 120 pages, from `data\packets`; you do not need to upload them manually.
+In the final step, you will move from authoring analyzers to reviewing their results in an application. The Insurance Workbench loads ten customer packets, totaling 118 pages, from `data\packets`; you do not need to upload them manually.
 
 You will first explore the included saved results without submitting analysis. Then you will investigate consistency checks and compare policy review with and without retrieval. Finally, you can connect the router you built in step 4 and explicitly start a live run. CU Studio remains your tool for editing and building analyzers.
 
@@ -361,10 +358,10 @@ powershell -ExecutionPolicy Bypass -File .\infra\launch-workbench.ps1 `
   -Endpoint "https://YOUR-APPROVED-RESOURCE.services.ai.azure.com"
 ```
 
-1. Reopen or reload [Insurance Workbench App](http://127.0.0.1:8791/). In **Analyzer**, select the exact `..._router` ID you built in step 4. The list contains ready custom logical classifiers/routers, not standalone prebuilts. If missing, check the endpoint, permissions, API version, and that the analyzer was built successfully.
-2. Click **Run live**. Read the confirmation for ten packets / 120 pages; only confirm when you intend to incur Azure charges. The app submits each packet once to the selected ready router and uses its linked extraction routes. It does not create analyzers, deploy models, or add a separate Statement pass.
+1. Reopen or reload [Insurance Workbench App](http://127.0.0.1:8791/). In **Analyzer**, select the exact ID you built in step 4, for example **router_analyzer**. The list contains ready custom logical classifiers/routers, not standalone prebuilts. If missing, check the endpoint, permissions, API version, and that the analyzer was built successfully.
+2. Click **Run live**. Read the confirmation for ten packets / 118 pages; only confirm when you intend to incur Azure charges. The app submits each packet once to the selected ready router and uses its linked extraction routes. It does not create analyzers, deploy models, or add a separate Statement pass.
 3. Watch progress and elapsed time. Each native response is saved under `data\results\RUN-ID` before results are derived. The live batch then runs the fixed extraction checks. Packet analysis incurs Azure charges. Completed results become a new cache entry. A failed run remains visibly failed; inspect its error before explicitly starting another billable run.
-4. Compare your live extraction with the PDFs and the saved run. To see classification alone, select your step 3 `..._classifier` and explicitly start a separate billable run. Fields appear only when extraction routes actually returned them.
+4. Compare your live extraction with the PDFs and the saved run. To see classification alone, select your step 3 analyzer, for example **packet_classifier**, and explicitly start a separate billable run. Fields appear only when extraction routes actually returned them.
 
 > [!Note] **Checkpoint:** you connected CU results to a separate application, compared policy checks with and without retrieval, and traced a daily-rate result to its SOP.
 
@@ -382,8 +379,8 @@ powershell -ExecutionPolicy Bypass -File .\infra\launch-workbench.ps1 `
 
    | Field | Description |
    |---|---|
-   | `PartsAmount` | `Part amount associated with each line item` |
-   | `LaborAmount` | `Labor amount associated with each line item` |
+   | +++PartsAmount+++ | +++Part amount associated with each line item+++ |
+   | +++LaborAmount+++ | +++Labor amount associated with each line item+++ |
 
    Keep the field order `PartsAmount`, `LaborAmount`, then `TotalAmount`. Do not replace `TotalAmount`; the consistency check continues to prefer a returned row total and uses parts plus labor only when that total is missing.
 5. In Studio, upload and test [packet 8's repair estimate](../data/documents/packet-08/05-estimate.pdf) before building. Inspect every line item and its source regions. A useful result for this document is:
