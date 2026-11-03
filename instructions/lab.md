@@ -14,7 +14,7 @@ In this lab you will use Azure AI Content Understanding to turn synthetic insura
 - **Customize extraction:** extend an invoice template to extract vehicle, VIN, and odometer details from a repair estimate, then build a Statement analyzer that combines extracted facts with grounded summaries.
 - **Classify and split document packets:** identify document types and logical page ranges in mixed insurance packets, keeping continuation pages together without extracting fields yet.
 - **Add extraction routes:** connect document categories to prebuilt analyzers and your custom repair and Statement analyzers, including dedicated routes for towing and rental invoices. Review the returned fields and source highlights.
-- **Review results in the Insurance Workbench:** explore saved results, investigate consistency checks, compare policy reviews with and without retrieval, then connect your own built analyzer to run live analysis across ten customer packets.
+- **Review a collection in the Insurance Workbench:** compare document types and extracted fields across ten packets, spot missing or repeated content, and use business consistency checks to investigate suspicious values before exploring policy reviews and live analysis.
 
 ===
 
@@ -258,7 +258,7 @@ Inspect ID fields on segment 1, nested 1099-A fields on segment 2, and custom `v
 
 In this step, you will move from authoring analyzers to reviewing their results in an application. The Insurance Workbench loads ten customer packets, totaling 120 pages, from `data\packets`; you do not need to upload them manually.
 
-You will first explore the included saved results without submitting analysis. Then you will investigate consistency checks and compare policy review with and without retrieval. Finally, you can connect the router you built in step 4 and explicitly start a live run. CU Studio remains your tool for editing and building analyzers.
+To evaluate an analyzer, run it across a representative collection, not just one sample, and compare the results. You will use saved responses from a real CU run across all ten packets, then apply business consistency checks in step 6. Loading saved results does not submit new analysis. CU Studio remains your tool for editing and building analyzers.
 
 ### Prepare and launch the app
 
@@ -299,12 +299,17 @@ For live policy checks and follow-up chat, complete [Prepare live policy checks]
 
 > [!Note] To stop the app at anytime just return to PowerShell and press **Ctrl+C**. 
 
-### Explore the included results first 
+### Parse and extract across the collection
 
-1. Click **Parse and extract tab** then select **Load cached results** to load the included completed **10/10** run. 
-2. Start with **Classification**. Each row is one customer; each check is a returned document instance and page range. Click a check or field value to open its full source PDF at that page. Other is hidden from this grid, not removed from the response.
-3. Switch to **ID**, **1099-A**, **Repair Estimate**, **Statement**, **Towing Invoice**, and **Rental Invoice**. 
-4. Turn on **Confidence** to inspect returned scores. Blank means the service omitted a score, not zero. Click line items for source boxes or their table icon to expand item rows below the customer.
+1. Open **Parse and extract**, select **Load cached results**, and wait for loading to finish. Confirm the included run is complete: **10/10** packets.
+2. In **Classification**, compare document types across rows. Each row is one customer; each check mark is a returned document instance and page range, not an accuracy check. Packet **01** has one repair estimate and a rental invoice; packet **03** has two repair estimates and a towing invoice, but no rental invoice. Select the marks to inspect the source pages.
+3. Select **Repair Estimate** and turn on **All fields**. Compare **Invoice Id** and **Invoice Date** in packets **01** and **02**, scrolling horizontally if needed. A blank cell means no value was returned; check the PDF to distinguish an unstated fact from missed extraction. Packet **03** has a multiple-document warning because this field grid shows only the first estimate; use **Classification** to inspect both.
+4. Expand **Line Items** using its table icon. Compare packet **01**'s five rows with packet **08**'s three. The same fields repeat for each item; inspect their values and source boxes rather than treating the array as one value.
+5. Switch to **ID**, **1099-A**, **Towing Invoice**, and **Rental Invoice** to compare their field coverage. Turn on **Confidence** to inspect returned scores. A blank score means the service omitted it, not zero; even high confidence does not prove a value is correct.
+
+> [!Note] The included cached router has no `statement` route. Those pages remain **Other**, which the grid hides but retains in native JSON. Your step 4 router includes Statement.
+
+> [!Note] **Checkpoint:** you can spot missing or repeated document types and fields across a collection. Populated fields alone do not establish extraction accuracy.
 
 ===
 ## Step 6. Investigate consistency checks and agent reviews
