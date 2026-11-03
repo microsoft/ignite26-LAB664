@@ -38,8 +38,8 @@ Once done, follow the steps below to explore the prebuilt analyzers:
 
 Now come back to the previous page - by clicking on the arrow on the top left corner of the page - and let's examine the differences between the prebuilt layout extraction and the schema-based extraction for the same document. 
 1. Scroll down on the **Procurement** section to locate the **Invoice** prebuilt analyzer and click on it to open the details.
-2. Inspect the default sample to understand how the schema-based extraction identifies and extracts specific fields relevant to the document type, such as **AmontDue**, **BalanceForward** and **Billing Address**.
-3. Now upload the same **towing-invoice.pdf** document to see how the schema-based extraction applies to your own file. Compare the extracted fields with the layout extraction results you've got in the previous step to understand the differences.
+2. Inspect the default sample to understand how the schema-based extraction identifies and extracts specific fields relevant to the document type, such as **AmontDue**, **BalanceForward** and **Billing Address**. Note that each field is also mapped to the corresponding confidence score.
+3. Now upload the same **towing-invoice.pdf** document to see how the schema-based extraction applies to your own file. Compare the extracted fields and confidence scores with the layout extraction results you've got in the previous step to understand the differences.
 
 Feel free to experiment with further pre-built analyzers to understand how CU Studio handles different document types and extraction scenarios. Below you can find a few examples of prebuilt analyzers along with the sample documents provided in the data folder, and the fields they extract.
 
@@ -114,7 +114,7 @@ You should have **seven flat fields: five Extract and two Generate**, with **Sou
 6. Wait until saving indicators clear, then select **Run analysis** to test the uploaded handwritten statement. Inspect the returned facts alongside the source document.
    - In the statement, check `claimant_name = "Danielle Ortiz"` and `incident_date = 2026-02-12`. The incident date should not be replaced by the letter's sent date.
    - The five *Extract* fields contain stated facts; the two *Generate* fields provide readable, grounded synthesis rather than verbatim quotes.
-   - Inspect source highlights.
+   - Inspect source highlights and confidence where returned. 
    - If a fact is not stated in the document, check that the analyzer leaves the corresponding field empty rather than guessing a value.
 
 > [!Tip] 
