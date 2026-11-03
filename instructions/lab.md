@@ -38,8 +38,8 @@ Once done, follow the steps below to explore the prebuilt analyzers:
 
 Now come back to the previous page - by clicking on the arrow on the top left corner of the page - and let's examine the differences between the prebuilt layout extraction and the schema-based extraction for the same document. 
 1. Scroll down on the **Procurement** section to locate the **Invoice** prebuilt analyzer and click on it to open the details.
-2. Inspect the default sample to understand how the schema-based extraction identifies and extracts specific fields relevant to the document type, such as **AmontDue**, **BalanceForward** and **Billing Address**. Note that each field is also mapped to the corresponding confidence score.
-3. Now upload the same **towing-invoice.pdf** document to see how the schema-based extraction applies to your own file. Compare the extracted fields and confidence scores with the layout extraction results you've got in the previous step to understand the differences.
+2. Inspect the default sample to understand how the schema-based extraction identifies and extracts specific fields relevant to the document type, such as **AmontDue**, **BalanceForward** and **Billing Address**.
+3. Now upload the same **towing-invoice.pdf** document to see how the schema-based extraction applies to your own file. Compare the extracted fields with the layout extraction results you've got in the previous step to understand the differences.
 
 Feel free to experiment with further pre-built analyzers to understand how CU Studio handles different document types and extraction scenarios. Below you can find a few examples of prebuilt analyzers along with the sample documents provided in the data folder, and the fields they extract.
 
@@ -114,7 +114,7 @@ You should have **seven flat fields: five Extract and two Generate**, with **Sou
 6. Wait until saving indicators clear, then select **Run analysis** to test the uploaded handwritten statement. Inspect the returned facts alongside the source document.
    - In the statement, check `claimant_name = "Danielle Ortiz"` and `incident_date = 2026-02-12`. The incident date should not be replaced by the letter's sent date.
    - The five *Extract* fields contain stated facts; the two *Generate* fields provide readable, grounded synthesis rather than verbatim quotes.
-   - Inspect source highlights and confidence where returned. 
+   - Inspect source highlights.
    - If a fact is not stated in the document, check that the analyzer leaves the corresponding field empty rather than guessing a value.
 
 > [!Tip] 
@@ -301,11 +301,11 @@ For live policy checks and follow-up chat, complete [Prepare live policy checks]
 
 ### Parse and extract across the collection
 
-1. Open **Parse and extract**, select **Load cached results**, and wait for loading to finish. Confirm the included run is complete: **10/10** packets.
-2. In **Classification**, compare document types across rows. Each row is one customer; each check mark is a returned document instance and page range, not an accuracy check. Packet **01** has one repair estimate and a rental invoice; packet **03** has two repair estimates and a towing invoice, but no rental invoice. Select the marks to inspect the source pages.
+1. Open **Parse and extract**, select **Load cached results**, and wait for the loading message to disappear. Confirm the **Cached** badge and customer rows **#1-#10**.
+2. In **Classification**, compare document types across rows. Each customer row **#n** corresponds to packet **n**; each check mark identifies a returned document instance and page range. Packet **01** has one repair estimate and a rental invoice; packet **03** has two repair estimates and a towing invoice, but no rental invoice. Select the marks to inspect the source pages.
 3. Select **Repair Estimate** and turn on **All fields**. Compare **Invoice Id** and **Invoice Date** in packets **01** and **02**, scrolling horizontally if needed. A blank cell means no value was returned; check the PDF to distinguish an unstated fact from missed extraction. Packet **03** has a multiple-document warning because this field grid shows only the first estimate; use **Classification** to inspect both.
 4. Expand **Line Items** using its table icon. Compare packet **01**'s five rows with packet **08**'s three. The same fields repeat for each item; inspect their values and source boxes rather than treating the array as one value.
-5. Switch to **ID**, **1099-A**, **Towing Invoice**, and **Rental Invoice** to compare their field coverage. Turn on **Confidence** to inspect returned scores. A blank score means the service omitted it, not zero; even high confidence does not prove a value is correct.
+5. Switch to **ID**, **1099-A**, **Towing Invoice**, and **Rental Invoice** to compare their field coverage.
 
 > [!Note] The included cached router has no `statement` route. Those pages remain **Other**, which the grid hides but retains in native JSON. Your step 4 router includes Statement.
 
@@ -324,7 +324,7 @@ Plausible-looking fields can hide extraction errors. **Check consistency** appli
 
 1. Select **Check consistency**. It uses the same loaded CU results; switching tabs does not submit analysis.
 2. Open packet **03**'s **Warn** under **Multiple Estimates Warning**. Compare the two shops' **$1,699.04** and **$1,827.24** quotes with their source documents. Different quotes are legitimate business variation, not automatically an extraction error.
-3. Open packet **08**'s red **Error** under **Repair line items, SubTotal verification**. The saved result shows `USD 980.00 + 124.00 + 0.00 = 1104.00; Subtotal = 1600.00`. Review the explanation, then select the formula or its fields to inspect the source boxes. This repair PDF was deliberately changed to separate parts and labor amounts; the saved extraction used parts amounts as row totals and missed labor.
+3. Open packet **08**'s red **Error** under **Repair line items, SubTotal verification**. The saved result shows `USD 980.00 + 124.00 + 0.00 = 1104.00; Subtotal = 1600.00`. Review the explanation, wait for the PDF to show **page 1**, then select the formula to highlight the source amounts. This repair PDF was deliberately changed to separate parts and labor amounts; the saved extraction used parts amounts as row totals and missed labor.
 
 > [!Note] **Error** flags a failed business rule; **Warn** can mean competing quotes or missing inputs. Check the explanation and source before attributing a finding to extraction. **Pass** confirms only the tested relationship, not every extracted value.
 
