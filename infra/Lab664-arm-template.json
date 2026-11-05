@@ -63,7 +63,6 @@
     "contentUnderstandingDefaults": {
       "modelDeployments": {
         "text-embedding-3-large": "[variables('textEmbedding3LargeDeploymentName')]",
-        "gpt-5.2": "[variables('gpt52DeploymentName')]",
         "gpt-5.5": "[variables('gpt55DeploymentName')]",
         "gpt-6.1-sol": "[variables('gpt61SolDeploymentName')]",
         "prebuilt-analyzer-completion": "[variables('gpt52DeploymentName')]",
