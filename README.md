@@ -13,6 +13,20 @@ Enterprise processes start with unstructured content—documents, images, audio,
 
 ### 🚀 Getting started
 
+#### View the session decks
+
+The browser-ready **LAB664** and **BRK245** sessions have phone-friendly, scrollable
+reading editions with inline demo videos and PowerPoint downloads. The original
+animated slides and unedited notes remain available through **View animated slides**.
+The LAB664 reading page links directly to the lab instructions.
+After [GitHub Pages is enabled](slides/web/README.md#publish-on-github-pages),
+view the [deck gallery](https://microsoft.github.io/ignite26-LAB664/),
+[LAB664](https://microsoft.github.io/ignite26-LAB664/lab664/), or
+[BRK245](https://microsoft.github.io/ignite26-LAB664/brk245/).
+These links become available after the first successful Pages deployment.
+GitHub's repository file viewer shows HTML source, not a running presentation.
+For local viewing and publishing details, see the [deck guide](slides/web/README.md).
+
 Follow the [nine-step lab guide](instructions/lab.md) for both guided and
 self-paced sessions in the provisioned lab environment.
 The guide covers Content Understanding extraction in CU Studio,
