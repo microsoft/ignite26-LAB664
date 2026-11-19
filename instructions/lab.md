@@ -176,7 +176,9 @@ In this step, we will build a custom repair analyzer to handle repair estimate d
 
 13. Once you are prompted with 'Built successfully', your analyzer is ready for use. Click on **Jump to analyzer list** to verify the analyzer details. Close the window once done. You'll find your newly created analyzer in the **Analyzer list**.
 
-!IMAGE[22c2gk9p.png](instructions359897/22c2gk9p.png)
+!IMAGE[kd8y2urd.png](instructions359897/kd8y2urd.png)
+
+> [!TIP] Double check the API version of the analyzer you just created is '2026-06-01-preview'. You won't be able to change it later, so you need to create a new analyzer with the correct API version otherwise.
 
 ===
 
@@ -238,7 +240,10 @@ Next, test the same schema against a typed email:
 1. Select **Browse for Files** and upload `C:\Users\LabUser\Desktop\ignite26-LAB664\data\samples\email-statement.pdf`. Then select **Run analysis**.
 2. Perform the same checks as in the handwritten statement. 
 3. After reviewing both documents, select **Build analyzer** and enter a new unique ID, for example `statement_extractor_analyzer`.  In the **Analyzer list**, you should now see two custom analyzers, as in the screenshot below.
-!IMAGE[516v1pe7.png](instructions359897/516v1pe7.png)
+
+!IMAGE[61ot591l.png](instructions359897/61ot591l.png)
+
+> [!TIP] Double check the API version of the analyzer you just created is '2026-06-01-preview'. You won't be able to change it later, so you need to create a new analyzer with the correct API version otherwise.
 
 > [!Note] **Checkpoint:** your custom repair and statement analyzers have both been tested and built, and you have recorded both analyzer IDs.
 
@@ -332,7 +337,7 @@ In the previous step, you tested a small packet to ensure the classifier correct
 
 Continue in the editable step 5 project. If you left it, return to [CU Studio Build](https://contentunderstanding.ai.azure.com/build), open **Project list**, and open your project.
 
-Choose **one** configuration path, then continue at [Verify, test, and build the router](#verify-test-and-build-the-router). Both paths finish with the same tests and build.
+Choose **one** of the two configuration paths below (import or manual), then continue at [Verify, test, and build the router](#verify-test-and-build-the-router). Both paths finish with the same tests and build.
 
 If you chose different custom IDs in steps 3-4, replace `repair_extractor_analyzer` and `statement_extractor_analyzer` in the imported rules' **Analyzer ID** selectors with your actual built IDs before saving. Use those same IDs for manual entry. Red **Analyzer not found** labels must be resolved before running.
 
