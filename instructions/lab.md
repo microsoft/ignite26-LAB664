@@ -267,7 +267,7 @@ You will start with a small three-page packet, then test the same configuration 
  
 > [!Note] **Upload first:** the routing-rule editor becomes available after a file is uploaded.
 
-3. Choose **one** way to configure the four categories. Do not assign child analyzer IDs yet.
+3. Choose **one** of the following ways (Import/Manual Entry) to configure the four categories. Do not assign child analyzer IDs yet.
 
 > [+Note] **Import from JSON - classification rules**
 >
