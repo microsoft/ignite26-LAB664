@@ -412,7 +412,7 @@ The app automatically loads the included cached extraction results and policy re
 
 ### Launch the app
 
-1. Return to the PowerShell window you used in [step 1](#step-1-environment-setup). Confirm both setup commands completed successfully and **Deploy** reported `Workbench configuration activated`.
+1. Return to the PowerShell window you used in [step 1](#step-1-environment-setup). Confirm both setup commands completed successfully and **Deploy** reported 'Workbench configuration activated'.
 If it is still running, wait for it to finish. 
 - If either command failed, resolve the reported error and rerun that command successfully before continuing.
 
