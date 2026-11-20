@@ -1,6 +1,6 @@
 // Authoring only: render lossless slide images using an installed Chromium browser.
 import { spawn } from "node:child_process";
-import { mkdtemp, readFile, mkdir, writeFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -70,7 +70,10 @@ try {
   await call("Emulation.setDeviceMetricsOverride", {
     width: 1920, height: 1080, deviceScaleFactor: 1.5, mobile: false,
   });
-  for (const slug of ["lab664", "brk245"]) {
+  const slugs = (await readdir(site, { withFileTypes: true }))
+    .filter(entry => entry.isDirectory() && entry.name !== "tools")
+    .map(entry => entry.name).sort();
+  for (const slug of slugs) {
     const content = JSON.parse(await readFile(path.join(site, slug, "reading.json"), "utf8"));
     const slides = content.sections.flatMap(section => section.slides);
     const destination = path.join(site, slug, "assets", "slides");

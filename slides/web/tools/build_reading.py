@@ -283,8 +283,8 @@ def render_presentation(html: str, content: dict) -> str:
 
 
 def build(check: bool = False) -> None:
-    for slug in ("lab664", "brk245"):
-        directory = SITE / slug
+    for directory in sorted(path.parent for path in SITE.glob("*/reading.json")):
+        slug = directory.name
         content = json.loads((directory / "reading.json").read_text(encoding="utf-8"))
         presentation = directory / "presentation.html"
         original = presentation.read_text(encoding="utf-8")

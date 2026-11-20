@@ -9,8 +9,8 @@ class ReadingEditionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.editions = {}
-        for slug in ("lab664", "brk245"):
-            directory = SITE / slug
+        for directory in sorted(path.parent for path in SITE.glob("*/reading.json")):
+            slug = directory.name
             original = (directory / "presentation.html").read_text(encoding="utf-8")
             content = json.loads((directory / "reading.json").read_text(encoding="utf-8"))
             cls.editions[slug] = (directory, original, content, load_deck(original))
