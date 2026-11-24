@@ -1,0 +1,81 @@
+{
+ "title": "LAB664 \u00b7 Build a claims workflow you can inspect, test, and improve",
+ "slug": "lab664",
+ "slides": [
+  {
+   "n": 1,
+   "title": "Build a claims workflow you can\ninspect, test, and improve",
+   "src": 1
+  },
+  {
+   "n": 2,
+   "title": "Lab 664: Building Agentic document workflowsWelcome!",
+   "src": 2
+  },
+  {
+   "n": 3,
+   "title": "Every day work...",
+   "src": 3
+  },
+  {
+   "n": 4,
+   "title": "Top use cases for unstructured documents",
+   "src": 4
+  },
+  {
+   "n": 5,
+   "title": "From a claim packet to a clear next action",
+   "src": 5
+  },
+  {
+   "n": 6,
+   "title": "Make each step inspectable",
+   "src": 6
+  },
+  {
+   "n": 7,
+   "title": "LLM alone vs. Content Understanding",
+   "src": 9
+  },
+  {
+   "n": 8,
+   "title": "LLM alone vs. Content Understanding",
+   "src": 10
+  },
+  {
+   "n": 9,
+   "title": "The workflow you'll build",
+   "src": 11
+  },
+  {
+   "n": 10,
+   "title": "Open the lab and start building",
+   "src": 12
+  },
+  {
+   "n": 11,
+   "title": "Open the lab and start building",
+   "src": 13
+  },
+  {
+   "n": 12,
+   "title": "Come learn more on Thursday",
+   "src": 14
+  },
+  {
+   "n": 13,
+   "title": "",
+   "src": 15
+  },
+  {
+   "n": 14,
+   "title": "",
+   "src": 28
+  },
+  {
+   "n": 15,
+   "title": "",
+   "src": 29
+  }
+ ]
+}
